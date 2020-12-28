@@ -3571,7 +3571,7 @@
                 o(this, e), this.opts = i, this.styles = t(78), this.element = n.appendChild(document.createElement("div")), this.element.classList.add(this.styles["guify-toast-area"]), (0, a.default)(this.element, {
                     position: "absolute",
                     width: "30%",
-                    height: "100%"
+                    height: "30%"
                 })
             }
             return i(e, [{
