@@ -10,19 +10,15 @@ var Heap, defaultCmp, floor, heappop, heappush, min, updateItem, _siftdown, _sif
 floor = Math.floor, min = Math.min;
 
 defaultCmp = function(x, y) {
-    if (x < y) {
-    	return -1;
-    }
-    if (x > y) {
-        return 1;
-    }
+    if (x < y) return -1;
+    if (x > y) return 1;
+    
     return 0;
 };
 
 heappush = function(array, item, cmp) {
-    if (cmp == null) {
-        cmp = defaultCmp;
-    }
+    if (cmp == null) cmp = defaultCmp;
+
     array.push(item);
     return _siftdown(array, 0, array.length - 1, cmp);
 };
@@ -45,13 +41,11 @@ heappop = function(array, cmp) {
 
 updateItem = function(array, item, cmp) {
     var pos;
-    if (cmp == null) {
-        cmp = defaultCmp;
-    }
+    if (cmp == null) cmp = defaultCmp;
     pos = array.indexOf(item);
-    if (pos === -1) {
-        return;
-    }
+
+    if (pos === -1) return;
+    
     _siftdown(array, 0, pos, cmp);
     return _siftup(array, pos, cmp);
 };
@@ -285,6 +279,27 @@ Grid.prototype.getNeighbors = function(node, diagonalMovement) {
     return neighbors;
 };
 
+Grid.prototype.clone = function() {
+    var i, j,
+
+        width = this.width,
+        height = this.height,
+        thisNodes = this.nodes,
+
+        newGrid = new Grid(width, height),
+        newNodes = new Array(height);
+
+    for (i = 0; i < height; ++i) {
+        newNodes[i] = new Array(width);
+        for (j = 0; j < width; ++j) {
+            newNodes[i][j] = new Node(j, i, thisNodes[i][j].walkable);
+        }
+    }
+
+    newGrid.nodes = newNodes;
+
+    return newGrid;
+};
 
 function AStarFinder(opt) {
     opt = opt || {};
@@ -311,7 +326,19 @@ function AStarFinder(opt) {
     } else {
         this.heuristic = opt.heuristic || octile;
     }
+};
+
+function BestFirstFinder(opt) {
+    AStarFinder.call(this, opt);
+
+    var orig = this.heuristic;
+    this.heuristic = function(dx, dy) {
+        return orig(dx, dy) * 1000000;
+    };
 }
+
+BestFirstFinder.prototype = new AStarFinder();
+BestFirstFinder.prototype.constructor = BestFirstFinder;
 
 AStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
     var openList = new Heap(function(nodeA, nodeB) {
